@@ -5,7 +5,6 @@ import com.projuris.projetoStag.entities.Evento;
 import com.projuris.projetoStag.repositories.EventoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,11 +21,15 @@ import static java.time.ZoneId.systemDefault;
 @Service
 public class EventoService {
 
-    @Autowired
-    private EventoRepository eventoRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final EventoRepository eventoRepository;
+
+    private final ModelMapper modelMapper;
+
+    public EventoService(EventoRepository eventoRepository, ModelMapper modelMapper) {
+        this.eventoRepository = eventoRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Transactional
     public Object save(EventoDTO eventoDTO) {

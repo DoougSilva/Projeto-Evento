@@ -2,7 +2,6 @@ package com.projuris.projetoStag.resources;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.services.EventoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -16,8 +15,12 @@ import javax.validation.Valid;
 @RequestMapping("/evento")
 public class eventoResource {
 
-    @Autowired
-    private EventoService eventoService;
+
+    private final EventoService eventoService;
+
+    public eventoResource(EventoService eventoService) {
+        this.eventoService = eventoService;
+    }
 
     @PostMapping
     public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO){

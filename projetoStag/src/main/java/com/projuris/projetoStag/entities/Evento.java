@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -23,17 +25,21 @@ public class Evento implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Column
     private String name;
 
+    @NotNull
     @Column
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime date;
 
+    @NotNull
     @Column
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime dateFinal;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Chamber chamber;
 
