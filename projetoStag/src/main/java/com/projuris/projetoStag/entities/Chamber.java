@@ -1,6 +1,5 @@
 package com.projuris.projetoStag.entities;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter

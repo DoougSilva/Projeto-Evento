@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -22,12 +21,6 @@ public class eventoResource {
 
     @PostMapping
     public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
-        if(!eventoService.existsEvento(eventoDTO.getDate(), eventoDTO.getDateFinal(), eventoDTO.getChamber())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Chamber used in Data");
-        }
-        if(!eventoService.checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Date invalid");
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.save(eventoDTO));
     }
 
@@ -44,36 +37,16 @@ public class eventoResource {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id){
-        Optional<EventoDTO> eventoOptional = eventoService.findById(id);
-        if(!eventoOptional.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento not found.");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(eventoOptional.get());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(eventoService.findByEventoId(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
-        Optional<EventoDTO> eventoOptional = eventoService.findById(id);
-        if(!eventoOptional.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento not found.");
-        }
-        if(!eventoService.existsEvento(eventoDTO.getDate(), eventoDTO.getDateFinal(), eventoDTO.getChamber())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Chamber used in Data");
-        }
-        if(!eventoService.checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Date invalid");
-        }
-        eventoDTO.setId(eventoOptional.get().getId());
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.save(eventoDTO));
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.updateEvento(id, eventoDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id){
-        Optional<EventoDTO> eventoOptional = eventoService.findById(id);
-        if(!eventoOptional.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento not found.");
-        }
-        eventoService.delete(eventoOptional.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Evento deleted successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
     }
 }

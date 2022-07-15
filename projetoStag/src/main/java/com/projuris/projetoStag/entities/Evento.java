@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -36,4 +37,11 @@ public class Evento implements Serializable {
     @Enumerated(EnumType.STRING)
     private Chamber chamber;
 
+    public Evento(Optional<Evento> byId) {
+        this.id = byId.get().getId();
+        this.name = byId.get().getName();
+        this.date = byId.get().getDate();
+        this.dateFinal = byId.get().getDateFinal();
+        this.chamber = byId.get().getChamber();
+    }
 }

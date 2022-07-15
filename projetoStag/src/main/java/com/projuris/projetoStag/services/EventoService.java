@@ -1,9 +1,9 @@
 package com.projuris.projetoStag.services;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
-import com.projuris.projetoStag.entities.Chamber;
 import com.projuris.projetoStag.entities.Evento;
 import com.projuris.projetoStag.repositories.EventoRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,39 +25,87 @@ public class EventoService {
     @Autowired
     private EventoRepository eventoRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Transactional
-    public Evento save(EventoDTO eventoDTO) {
+    public Object save(EventoDTO eventoDTO) {
+        if(!existsEvento(eventoDTO)){
+            return "Chamber used in Data";
+        }
+        if(!checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
+            return "Date invalid";
+        }
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
-        return eventoRepository.save(evento);
+        eventoRepository.save(evento);
+        eventoDTO.setId(evento.getId());
+        return eventoDTO;
     }
 
-    @Transactional
     public Page<EventoDTO> findAll(PageRequest pageRequest) {
         Page<Evento> list = eventoRepository.findAll(pageRequest);
         return list.map(EventoDTO::new);
     }
 
-    public boolean existsEvento(LocalDateTime date, LocalDateTime dateFinal, Chamber chamber) {
+    public Object updateEvento(Long id, EventoDTO eventoDTO){
+        Evento evento = eventoRepository.findById(id).orElseThrow(() -> new IllegalStateException("Evento with id " + id + " does not exists."));
+        eventoDTO.setId(id);
+        if (eventoDTO.getName().length() > 2){
+            evento.setName(eventoDTO.getName());
+        } else {
+            throw new IllegalStateException("Name invalid");
+        }
+        if(!existsEvento(eventoDTO)){
+            return "Chamber used in Data";
+        }
+        if(!checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
+            return "Date invalid";
+        }
+        evento.setDate(eventoDTO.getDate());
+        evento.setDateFinal(eventoDTO.getDateFinal());
+        evento.setChamber(eventoDTO.getChamber());
+        eventoRepository.save(evento);
+        return toEventoDTO(evento);
+    }
+
+    public Optional<EventoDTO> findByEventoId(Long id){
+        if(!eventoRepository.existsById(id)){
+            throw new IllegalStateException("Evento with id " + id + " does not exists.");
+        }
+        return eventoRepository.findById(id).map(this::toEventoDTO);
+        }
+
+    @Transactional
+    public Object delete(Long id){
+        if(!eventoRepository.existsById(id)){
+            throw new IllegalStateException("Evento with id " + id + " does not exists.");
+        }
+        eventoRepository.deleteById(id);
+        return "Evento deleted successfully.";
+    }
+
+    public boolean existsEvento(EventoDTO eventoDTO) {
         ZoneId ZoneId = systemDefault();
-        long miliDate = date.atZone(ZoneId).toEpochSecond();
-        long miliDateFinal = dateFinal.atZone(ZoneId).toEpochSecond();
+        long miliDate = eventoDTO.getDate().atZone(ZoneId).toEpochSecond();
+        long miliDateFinal = eventoDTO.getDateFinal().atZone(ZoneId).toEpochSecond();
         List<Evento> eventos = eventoRepository.findAll();
-        boolean resp;
+        if(eventoDTO.getId() != null) {
+            eventos.remove(new Evento(eventoRepository.findById(eventoDTO.getId())));
+        }
         for (Evento e : eventos) {
             long miliTest =  e.getDate().atZone(ZoneId).toEpochSecond();
             long miliTest1 = e.getDateFinal().atZone(ZoneId).toEpochSecond();
-            if (miliDate > miliTest && miliDate < miliTest1 && e.getChamber() == chamber ) {
+            if (miliDate > miliTest && miliDate < miliTest1 && e.getChamber() == eventoDTO.getChamber() ) {
                 return false;
             }
-            if (miliDateFinal > miliTest && miliDateFinal <= miliTest1 && e.getChamber() == chamber ) {
+            if (miliDateFinal > miliTest && miliDateFinal <= miliTest1 && e.getChamber() == eventoDTO.getChamber() ) {
                 return false;
             }
-            if (miliDate < miliTest && miliDate < miliTest1 && miliDateFinal > miliTest && miliDateFinal > miliTest1 && e.getChamber() == chamber){
+            if (miliDate < miliTest && miliDate < miliTest1 && miliDateFinal > miliTest && miliDateFinal > miliTest1 && e.getChamber() == eventoDTO.getChamber()){
                 return false;
             }
-            if ( miliDate == miliTest && miliDateFinal == miliTest1 && e.getChamber() == chamber){
+            if ( miliDate == miliTest && miliDateFinal == miliTest1 && e.getChamber() == eventoDTO.getChamber()){
                 return false;
             }
         }
@@ -75,22 +123,7 @@ public class EventoService {
         else return true;
     }
 
-    public Optional<EventoDTO> findById(Long id){
-        Optional<Evento> eventoOptional = eventoRepository.findById(id);
-        Optional<EventoDTO> eventoDTOOptional = converterEmDTO(eventoOptional);
-        return eventoDTOOptional;
-        }
-
-    @Transactional
-    public void delete(EventoDTO eventoDTO){
-        var evento = new Evento();
-        BeanUtils.copyProperties(eventoDTO, evento);
-        eventoRepository.delete(evento);
-    }
-
-    public Optional<EventoDTO> converterEmDTO(Optional<Evento> eventoOptional){
-        var eventoDTO = new EventoDTO(eventoOptional);
-        Optional<EventoDTO> eventoDTOOptional = Optional.of(eventoDTO);
-        return eventoDTOOptional;
+    private EventoDTO toEventoDTO(Evento evento){
+        return modelMapper.map(evento, EventoDTO.class);
     }
 }
