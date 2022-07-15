@@ -38,17 +38,17 @@ public class eventoResource {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(eventoService.findByEventoId(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.updateEvento(id, eventoDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id){
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
     }
