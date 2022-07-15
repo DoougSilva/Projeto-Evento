@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: Projetinho
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: none
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/stagdb?currentSchema=projeto
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    changeLog: liquibase/master.xml
+  properties:
+    hibernate:
+      jdbc:
+        lob:
+          lob:
+            nonContextualCreation: true
+
+server:
+  port: 9090
