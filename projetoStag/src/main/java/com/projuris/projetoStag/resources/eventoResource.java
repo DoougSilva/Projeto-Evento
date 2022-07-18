@@ -40,7 +40,7 @@ public class eventoResource {
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(eventoService.findByEventoId(id));
+            return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoId(id));
     }
 
     @PutMapping("/id/{id}")
