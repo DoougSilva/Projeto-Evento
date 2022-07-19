@@ -23,8 +23,8 @@ public class eventoResource {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
-        return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.save(eventoDTO));
+    public Object saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
+        return eventoService.save(eventoDTO);
     }
 
     @GetMapping
@@ -34,22 +34,22 @@ public class eventoResource {
     ){
         PageRequest pageRequeste = PageRequest.of(page, size);
         Page<EventoDTO> list = eventoService.findAll(pageRequeste);
-        return ResponseEntity.ok(list);
+        return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id){
-            return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoId(id));
+    public Object getOneEvento(@PathVariable(value = "id") Long id){
+            return eventoService.findByEventoId(id);
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.updateEvento(id, eventoDTO));
+    public Object updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
+        return eventoService.updateEvento(id, eventoDTO);
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
+    public Object deleteEvento(@PathVariable(value = "id") Long id){
+        return eventoService.delete(id);
     }
 }

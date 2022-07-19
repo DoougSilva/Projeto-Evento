@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -32,18 +34,18 @@ public class EventoService {
     }
 
     @Transactional
-    public Object save(EventoDTO eventoDTO) {
+    public ResponseEntity<Object> save(EventoDTO eventoDTO) {
         if(!existsEvento(eventoDTO)){
-            return "Chamber used in Data";
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Chamber used in Data.");
         }
         if(!checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
-            return "Date invalid";
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Date invalid.");
         }
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
         eventoRepository.save(evento);
         eventoDTO.setId(evento.getId());
-        return eventoDTO;
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventoDTO);
     }
 
     public Page<EventoDTO> findAll(PageRequest pageRequest) {
@@ -51,41 +53,45 @@ public class EventoService {
         return list.map(EventoDTO::new);
     }
 
-    public Object updateEvento(Long id, EventoDTO eventoDTO){
-        Evento evento = eventoRepository.findById(id).orElseThrow(() -> new IllegalStateException("Evento with id " + id + " does not exists."));
+    public ResponseEntity<Object> updateEvento(Long id, EventoDTO eventoDTO){
+        Optional<Evento> eventoOptional = eventoRepository.findById(id);
+        if(eventoOptional.isEmpty()){
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento with id " + id + " does not exists.");
+        }
+        var evento = new Evento(eventoOptional);
         eventoDTO.setId(id);
         if (eventoDTO.getName().length() > 2){
             evento.setName(eventoDTO.getName());
         } else {
-            throw new IllegalStateException("Name invalid");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Name invalid.");
         }
         if(!existsEvento(eventoDTO)){
-            return "Chamber used in Data";
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Chamber used in Data.");
         }
         if(!checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
-            return "Date invalid";
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Date invalid.");
         }
         evento.setDate(eventoDTO.getDate());
         evento.setDateFinal(eventoDTO.getDateFinal());
         evento.setChamber(eventoDTO.getChamber());
         eventoRepository.save(evento);
-        return toEventoDTO(evento);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(toEventoDTO(evento));
     }
 
-    public Optional<EventoDTO> findByEventoId(Long id){
+    public ResponseEntity<Object> findByEventoId(Long id){
         if(!eventoRepository.existsById(id)){
-            throw new IllegalStateException("Evento with id " + id + " does not exists.");
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento with id " + id + " does not exists.");
         }
-        return eventoRepository.findById(id).map(this::toEventoDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(eventoRepository.findById(id).map(this::toEventoDTO));
         }
 
     @Transactional
-    public Object delete(Long id){
+    public ResponseEntity<Object> delete(Long id){
         if(!eventoRepository.existsById(id)){
-            throw new IllegalStateException("Evento with id " + id + " does not exists.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento with id " + id + " does not exists.");
         }
         eventoRepository.deleteById(id);
-        return "Evento deleted successfully.";
+        return ResponseEntity.status(HttpStatus.OK).body("Evento deleted successfully.");
     }
 
     public boolean existsEvento(EventoDTO eventoDTO) {
