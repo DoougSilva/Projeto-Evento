@@ -23,7 +23,7 @@ public class eventoResource {
     }
 
     @PostMapping
-    public Object saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
+    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
         return eventoService.save(eventoDTO);
     }
 
@@ -39,17 +39,17 @@ public class eventoResource {
 
 
     @GetMapping("/id/{id}")
-    public Object getOneEvento(@PathVariable(value = "id") Long id){
+    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id){
             return eventoService.findByEventoId(id);
     }
 
     @PutMapping("/id/{id}")
-    public Object updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
+    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
         return eventoService.updateEvento(id, eventoDTO);
     }
 
     @DeleteMapping("/id/{id}")
-    public Object deleteEvento(@PathVariable(value = "id") Long id){
+    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id){
         return eventoService.delete(id);
     }
 }
