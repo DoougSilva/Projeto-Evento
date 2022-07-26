@@ -3,7 +3,7 @@ package com.projuris.projetoStag.services;
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.entities.Evento;
 import com.projuris.projetoStag.repositories.EventoRepository;
-import com.projuris.projetoStag.utils.Payload;
+import com.projuris.projetoStag.dtos.PayloadErrorDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -35,13 +35,13 @@ public class EventoService {
 
     public ResponseEntity<Object> save(EventoDTO eventoDTO) {
         if (eventoDTO.getName().length() < 2){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Payload("Name invalid.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Name invalid."));
         }
         if(existsEvento(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Payload("Chamber used in Data.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Chamber used in Data."));
         }
         if(checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Payload("Date invalid.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Date invalid."));
         }
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
@@ -59,19 +59,19 @@ public class EventoService {
     public ResponseEntity<Object> updateEvento(Long id, EventoDTO eventoDTO){
         Optional<Evento> eventoOptional = eventoRepository.findById(id);
         if(eventoOptional.isEmpty()){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Payload("Evento with id " + id + " does not exists.").toJson());
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PayloadErrorDTO("Evento with id " + id + " does not exists."));
         }
         if (eventoDTO.getName().length() > 2){
             eventoOptional.get().setName(eventoDTO.getName());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Payload("Name invalid.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Name invalid."));
         }
         eventoDTO.setId(id);
         if(existsEvento(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Payload("Chamber used in Data.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Chamber used in Data."));
         }
         if(checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Payload("Date invalid.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Date invalid."));
         }
         eventoOptional.get().setDate(eventoDTO.getDate());
         eventoOptional.get().setDateFinal(eventoDTO.getDateFinal());
@@ -90,10 +90,10 @@ public class EventoService {
 
     public ResponseEntity<Object> delete(Long id){
         if(!eventoRepository.existsById(id)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Payload("Evento with id " + id + " does not exists.").toJson());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PayloadErrorDTO("Evento with id " + id + " does not exists."));
         }
         eventoRepository.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(new Payload("Evento deleted successfully.").toJson());
+        return ResponseEntity.status(HttpStatus.OK).body(new PayloadErrorDTO("Evento deleted successfully."));
     }
 
     public boolean existsEvento(EventoDTO eventoDTO) {
