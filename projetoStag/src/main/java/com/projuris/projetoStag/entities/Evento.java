@@ -2,6 +2,7 @@ package com.projuris.projetoStag.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -47,5 +48,8 @@ public class Evento implements Serializable {
         this.date = byId.get().getDate();
         this.dateFinal = byId.get().getDateFinal();
         this.chamber = byId.get().getChamber();
+    }
+    public Evento(Long id){
+        this.id = id;
     }
 }

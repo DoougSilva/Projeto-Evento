@@ -23,7 +23,7 @@ public class eventoResource {
 
     @PostMapping
     public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
-        return eventoService.save(eventoDTO);
+        return eventoService.saveEvento(eventoDTO);
     }
 
     @GetMapping

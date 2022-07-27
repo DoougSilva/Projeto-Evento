@@ -1,25 +1,55 @@
+server:
+  port: 9090
+
 spring:
   application:
     name: Projetinho
+  profiles:
+    active: dev
   jpa:
     database: POSTGRESQL
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            lob:
+              nonContextualCreation: true
     hibernate:
       ddl-auto: none
+  liquibase:
+    change-log: liquibase/master.xml
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    config:
+      enabled: false
   datasource:
-    platform: postgres
     url: jdbc:postgresql://localhost:5432/stagdb?currentSchema=projeto
     username: postgres
     password: postgres
-    driverClassName: org.postgresql.Driver
-  liquibase:
-    enabled: true
-    changeLog: liquibase/master.xml
-  properties:
-    hibernate:
-      jdbc:
-        lob:
-          lob:
-            nonContextualCreation: true
+    driver-class-name: org.postgresql.Driver
 
-server:
-  port: 9090
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate.hbm2ddl.auto: create
+  liquibase:
+    enabled: false

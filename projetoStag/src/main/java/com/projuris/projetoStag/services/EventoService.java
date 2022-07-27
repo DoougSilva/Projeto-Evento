@@ -33,7 +33,7 @@ public class EventoService {
     private final Clock clock;
 
 
-    public ResponseEntity<Object> save(EventoDTO eventoDTO) {
+    public ResponseEntity<Object> saveEvento(EventoDTO eventoDTO) {
         if (eventoDTO.getName().length() < 2){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Name invalid."));
         }
@@ -96,7 +96,7 @@ public class EventoService {
         return ResponseEntity.status(HttpStatus.OK).body(new PayloadErrorDTO("Evento deleted successfully."));
     }
 
-    public boolean existsEvento(EventoDTO eventoDTO) {
+    private boolean existsEvento(EventoDTO eventoDTO) {
         List<Evento> list = eventoRepository.findAll();
         if(eventoDTO.getId() != null){
             Optional<Evento> eventoOptional = eventoRepository.findById(eventoDTO.getId());
@@ -132,7 +132,7 @@ public class EventoService {
         return false;
     }
 
-    public boolean checkDate(LocalDateTime date, LocalDateTime dateFinal){
+    private boolean checkDate(LocalDateTime date, LocalDateTime dateFinal){
         if(dateFinal.isBefore(date)){
             return true;
         }
