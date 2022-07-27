@@ -1,4 +1,4 @@
-package com.projuris.projetoStag.config.serviceTest;
+package com.projuris.projetoStag.serviceTest;
 
 import com.projuris.projetoStag.config.ApplicationConfigTest;
 import com.projuris.projetoStag.repositories.EventoRepository;
