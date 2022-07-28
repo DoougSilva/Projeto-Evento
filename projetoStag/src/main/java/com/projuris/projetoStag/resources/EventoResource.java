@@ -12,12 +12,12 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path="/evento")
-public class eventoResource {
+public class EventoResource {
 
 
     private final EventoService eventoService;
 
-    public eventoResource(EventoService eventoService) {
+    public EventoResource(EventoService eventoService) {
         this.eventoService = eventoService;
     }
 

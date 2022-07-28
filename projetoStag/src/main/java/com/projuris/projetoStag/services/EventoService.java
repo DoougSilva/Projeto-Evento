@@ -40,7 +40,7 @@ public class EventoService {
         if(existsEvento(eventoDTO)){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Chamber used in Data."));
         }
-        if(checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
+        if(checkDate(eventoDTO)){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Date invalid."));
         }
         var evento = new Evento();
@@ -70,7 +70,7 @@ public class EventoService {
         if(existsEvento(eventoDTO)){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Chamber used in Data."));
         }
-        if(checkDate(eventoDTO.getDate(), eventoDTO.getDateFinal())){
+        if(checkDate(eventoDTO)){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Date invalid."));
         }
         eventoOptional.get().setDate(eventoDTO.getDate());
@@ -132,11 +132,14 @@ public class EventoService {
         return false;
     }
 
-    private boolean checkDate(LocalDateTime date, LocalDateTime dateFinal){
-        if(dateFinal.isBefore(date)){
+    private boolean checkDate(EventoDTO eventoDTO){
+        if(eventoDTO.getDateFinal().isBefore(eventoDTO.getDate())){
             return true;
         }
-        if(date.isBefore(LocalDateTime.now(clock))){
+        if(eventoDTO.getDate().isBefore(LocalDateTime.now(clock))){
+            return true;
+        }
+        if (eventoDTO.getDate().isEqual(eventoDTO.getDateFinal())){
             return true;
         }
         return false;

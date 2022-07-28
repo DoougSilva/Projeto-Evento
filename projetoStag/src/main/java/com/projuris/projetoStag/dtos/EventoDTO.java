@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.projuris.projetoStag.entities.Chamber;
 import com.projuris.projetoStag.entities.Evento;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventoDTO {
