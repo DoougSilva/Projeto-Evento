@@ -15,6 +15,8 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -86,8 +88,9 @@ public class EventoServiceUnitTest{
         evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
         evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 30));
         when(eventoRepository.findById(ArgumentMatchers.eq(eventoDTO.getId()))).thenReturn(eventoOptional);
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.times(1)).save(ArgumentMatchers.any(Evento.class));
+        Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
     }
 
     @Test // teste da validação existsEvento cenario 01
@@ -96,8 +99,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 8, 30));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         Mockito.verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test // teste da validação existsEvento cenario 02
@@ -106,8 +110,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 30));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test // teste da validação existsEvento cenario 03
@@ -116,8 +121,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
     @Test // teste da validação existsEvento cenario 04
     public void deveRetornarErroAoPersistitUmEventoComDatasEntreUmEventoExistente(){
@@ -125,8 +131,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 10));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 8,50 ));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test // teste da validação  existsEvento cenario 05
@@ -136,8 +143,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 30));
         evento.setDate(LocalDateTime.of(2022,7,28, 10, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 11,00 ));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test // teste da validação checkDate cenario 01
@@ -146,8 +154,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 10,00 ));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test // teste da validação checkDate cenario 02
@@ -156,8 +165,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 10,00 ));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test // teste da validação checkDate cenario 03
@@ -166,8 +176,9 @@ public class EventoServiceUnitTest{
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 10, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 11,00 ));
-        eventoService.saveEvento(eventoDTO);
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test
@@ -198,8 +209,9 @@ public class EventoServiceUnitTest{
     public void deveRetornarErroAoBuscarUmEventoQueNaoExiste(){
         Long eventoId = 1L;
         when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.FALSE);
-        eventoService.findByEventoId(eventoId);
+        ResponseEntity<Object> result = eventoService.findByEventoId(eventoId);
         verify(eventoRepository, Mockito.never()).findBy(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
     @Test
@@ -209,22 +221,25 @@ public class EventoServiceUnitTest{
         Evento evento = Mockito.mock(Evento.class);
         Optional<Evento> eventoOptional = Optional.of(evento);
         when(eventoRepository.findById(ArgumentMatchers.eq(eventoId))).thenReturn(eventoOptional);
-        eventoService.findByEventoId(eventoId);
+        ResponseEntity<Object> result = eventoService.findByEventoId(eventoId);
         verify(eventoRepository, Mockito.times(1)).findById(ArgumentMatchers.any(Long.class));
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
     }
     @Test
     public void deveRemoverUmEvento(){
         Long eventoId = 1L;
         when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.TRUE);
-        eventoService.delete(eventoId);
+        ResponseEntity<Object> result = eventoService.delete(eventoId);
         verify(eventoRepository, Mockito.times(1)).deleteById(ArgumentMatchers.any(Long.class));
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
     public void deveRetornarErroAoRemoverUmEventoQueNaoExiste(){
         Long eventoId = 1L;
         when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.FALSE);
-        eventoService.delete(eventoId);
+        ResponseEntity<Object> result = eventoService.delete(eventoId);
         verify(eventoRepository, Mockito.never()).deleteById(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 }

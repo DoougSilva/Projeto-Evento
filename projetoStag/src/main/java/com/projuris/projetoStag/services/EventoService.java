@@ -35,13 +35,13 @@ public class EventoService {
 
     public ResponseEntity<Object> saveEvento(EventoDTO eventoDTO) {
         if (eventoDTO.getName().length() < 2){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Name invalid."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PayloadErrorDTO("Name invalid."));
         }
         if(existsEvento(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Chamber used in Data."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PayloadErrorDTO("Chamber used in Data."));
         }
         if(checkDate(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Date invalid."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PayloadErrorDTO("Date invalid."));
         }
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
