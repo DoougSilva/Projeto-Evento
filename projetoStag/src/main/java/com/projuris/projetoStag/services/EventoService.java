@@ -46,8 +46,8 @@ public class EventoService {
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
         eventoRepository.save(evento);
-        Evento rest = eventoRepository.findById(evento.getId()).orElseThrow();
-        return ResponseEntity.status(HttpStatus.CREATED).body(toEventoDTO(rest));
+        Optional<Evento> rest = eventoRepository.findById(evento.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(toEventoDTO(rest.get()));
     }
 
     @Transactional(readOnly = true)
@@ -98,34 +98,35 @@ public class EventoService {
 
     private boolean existsEvento(EventoDTO eventoDTO) {
         List<Evento> list = eventoRepository.findAll();
-        if(eventoDTO.getId() != null){
-            Optional<Evento> eventoOptional = eventoRepository.findById(eventoDTO.getId());
-            list.remove(eventoOptional.get());
-        }
         for(Evento evento : list){
             if(eventoDTO.getDate().isAfter(evento.getDate())
                     && eventoDTO.getDate().isBefore(evento.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()){
+                    && eventoDTO.getChamber() == evento.getChamber()
+                    && eventoDTO.getId() != evento.getId()){
                return true;
             }
             if(eventoDTO.getDateFinal().isAfter(evento.getDate())
                     && eventoDTO.getDateFinal().isBefore(evento.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()){
+                    && eventoDTO.getChamber() == evento.getChamber()
+                    && eventoDTO.getId() != evento.getId()){
                 return true;
             }
             if(eventoDTO.getDate().isEqual(evento.getDate())
                     && eventoDTO.getDateFinal().isEqual(evento.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()){
+                    && eventoDTO.getChamber() == evento.getChamber()
+                    && eventoDTO.getId() != evento.getId()){
                 return true;
             }
             if(evento.getDate().isAfter(eventoDTO.getDate())
                     && evento.getDate().isBefore(eventoDTO.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()){
+                    && eventoDTO.getChamber() == evento.getChamber()
+                    && eventoDTO.getId() != evento.getId()){
                 return true;
             }
             if(evento.getDateFinal().isAfter(eventoDTO.getDate())
                     && evento.getDateFinal().isBefore(eventoDTO.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()){
+                    && eventoDTO.getChamber() == evento.getChamber()
+                    && eventoDTO.getId() != evento.getId()){
                 return true;
             }
         }
