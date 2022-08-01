@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +83,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // todas as validações corretas
-    public void devePersistitUmEvento() {
+    public void devePersistitUmEvento() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 9, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 10, 00));
         evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
@@ -94,7 +95,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação existsEvento cenario 01
-    public void deveRetornarErroAoPersistitUmEventoComDataInicialEtiverDentroDeOutroEvento(){
+    public void deveRetornarErroAoPersistitUmEventoComDataInicialEtiverDentroDeOutroEvento() throws Exception{
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 8, 15));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 00));
@@ -105,7 +106,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação existsEvento cenario 02
-    public void deveRetornarErroAoPersistitUmEventoComDataFinalEtiverDentroDeOutroEvento(){
+    public void deveRetornarErroAoPersistitUmEventoComDataFinalEtiverDentroDeOutroEvento() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 8, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 30));
@@ -116,7 +117,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação existsEvento cenario 03
-    public void deveRetornarErroAoPersistitUmEventoComDatasDeUmEventoExistente(){
+    public void deveRetornarErroAoPersistitUmEventoComDatasDeUmEventoExistente() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 8, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 45));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 00));
@@ -126,7 +127,7 @@ public class EventoServiceUnitTest{
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
     @Test // teste da validação existsEvento cenario 04
-    public void deveRetornarErroAoPersistitUmEventoComDatasEntreUmEventoExistente(){
+    public void deveRetornarErroAoPersistitUmEventoComDatasEntreUmEventoExistente() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 8, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 10));
@@ -137,7 +138,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação  existsEvento cenario 05
-    public void deveRetornarErroAoPersistitUmEventoComNomeInvalido(){
+    public void deveRetornarErroAoPersistitUmEventoComNomeInvalido() throws Exception {
         eventoDTO.setName("");
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 9, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 30));
@@ -149,7 +150,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação checkDate cenario 01
-    public void deveRetornarErroAoPersistitUmEventoComDataFinalAnteriorDaDataInicial(){
+    public void deveRetornarErroAoPersistitUmEventoComDataFinalAnteriorDaDataInicial() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 9, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 8, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 9, 00));
@@ -160,7 +161,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação checkDate cenario 02
-    public void deveRetornarErroAoPersistitUmEventoComDataInicialAnteriorDaDataAtual(){
+    public void deveRetornarErroAoPersistitUmEventoComDataInicialAnteriorDaDataAtual() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 7, 59));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 9, 00));
@@ -171,7 +172,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test // teste da validação checkDate cenario 03
-    public void deveRetornarErroAoPersistitUmEventoComDataInicialIgualDataFinal(){
+    public void deveRetornarErroAoPersistitUmEventoComDataInicialIgualDataFinal() throws Exception {
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 9, 00));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 10, 00));
@@ -181,65 +182,84 @@ public class EventoServiceUnitTest{
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
+    @Test // teste da validação checkDate cenario 04
+    public void deveRetornarErroAoPersistitUmEventoComDataExedendoTempoLimite() throws Exception {
+        eventoDTO.setDate(LocalDateTime.of(2022,7,28, 12, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 18, 00));
+        evento.setDate(LocalDateTime.of(2022,7,28, 10, 00));
+        evento.setDateFinal(LocalDateTime.of(2022,7,28, 11,00 ));
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
+        verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+    }
+
+    @Test // teste da validação checkDate cenario 05
+    public void deveRetornarErroAoPersistitUmEventoComDatasMuitoDistantes() throws Exception {
+        eventoDTO.setDate(LocalDateTime.of(2022,7,28, 12, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022,7,29, 17, 00));
+        evento.setDate(LocalDateTime.of(2022,7,28, 10, 00));
+        evento.setDateFinal(LocalDateTime.of(2022,7,28, 11,00 ));
+        ResponseEntity<Object> result = eventoService.saveEvento(eventoDTO);
+        verify(eventoRepository, Mockito.never()).save(ArgumentMatchers.any());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+    }
+
     @Test
-    public void deveAtualizarUmEvento(){
-        Long eventoId = 1L;
-        evento.setName("TesteDoTest");
+    public void deveAtualizarUmEvento() throws Exception{
+        eventoDTO.setName("TesteDoTest");
         eventoDTO.setDate(LocalDateTime.of(2022,7,28, 8, 30));
         eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
         evento.setDate(LocalDateTime.of(2022,7,28, 8, 00));
         evento.setDateFinal(LocalDateTime.of(2022,7,28, 10,00 ));
         when(eventoRepository.findById(ArgumentMatchers.eq(evento.getId()))).thenReturn(eventoOptional);
-        eventoService.updateEvento(eventoId, eventoDTO);
+        ResponseEntity<Object> result = eventoService.updateEvento(evento.getId(), eventoDTO);
         Assertions.assertEquals(eventoOptional.get().getName(), eventoDTO.getName());
         Assertions.assertEquals(eventoOptional.get().getDate(), eventoDTO.getDate());
         Assertions.assertEquals(eventoOptional.get().getDateFinal(), eventoDTO.getDateFinal());
         Assertions.assertEquals(eventoOptional.get().getChamber(), eventoDTO.getChamber());
+        Assertions.assertEquals(HttpStatus.ACCEPTED, result.getStatusCode());
     }
     @Test
-    public void deveRetornarUmaListaDeEventos(){
+    public void deveRetornarUmaListaDeEventos() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Evento> list = Mockito.mock(Page.class);
-        when(eventoRepository.findAll(ArgumentMatchers.eq(pageRequest))).thenReturn(list);
-        eventoService.findAll(pageRequest);
+        Page<Evento> lista = new PageImpl<Evento>(list);
+        when(eventoRepository.findAll(ArgumentMatchers.eq(pageRequest))).thenReturn(lista);
+        ResponseEntity<Object> result = eventoService.findAll(pageRequest);
         verify(eventoRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(PageRequest.class));
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
-    public void deveRetornarErroAoBuscarUmEventoQueNaoExiste(){
-        Long eventoId = 1L;
-        when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.FALSE);
-        ResponseEntity<Object> result = eventoService.findByEventoId(eventoId);
+    public void deveRetornarErroAoBuscarUmEventoQueNaoExiste()throws Exception {
+        when(eventoRepository.existsById(anyLong())).thenReturn(Boolean.FALSE);
+        ResponseEntity<Object> result = eventoService.findByEventoId(anyLong());
         verify(eventoRepository, Mockito.never()).findBy(ArgumentMatchers.any(), ArgumentMatchers.any());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
     @Test
-    public void deveRetornarUmEvento(){
-        Long eventoId = 1L;
-        when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.TRUE);
+    public void deveRetornarUmEvento() throws Exception {
+        when(eventoRepository.existsById(anyLong())).thenReturn(Boolean.TRUE);
         Evento evento = Mockito.mock(Evento.class);
         Optional<Evento> eventoOptional = Optional.of(evento);
-        when(eventoRepository.findById(ArgumentMatchers.eq(eventoId))).thenReturn(eventoOptional);
-        ResponseEntity<Object> result = eventoService.findByEventoId(eventoId);
+        when(eventoRepository.findById(anyLong())).thenReturn(eventoOptional);
+        ResponseEntity<Object> result = eventoService.findByEventoId(anyLong());
         verify(eventoRepository, Mockito.times(1)).findById(ArgumentMatchers.any(Long.class));
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
     }
     @Test
-    public void deveRemoverUmEvento(){
-        Long eventoId = 1L;
-        when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.TRUE);
-        ResponseEntity<Object> result = eventoService.delete(eventoId);
-        verify(eventoRepository, Mockito.times(1)).deleteById(ArgumentMatchers.any(Long.class));
+    public void deveRemoverUmEvento() throws Exception {
+        when(eventoRepository.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        ResponseEntity<Object> result = eventoService.delete(anyLong());
+        verify(eventoRepository, Mockito.times(1)).deleteById(anyLong());
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
-    public void deveRetornarErroAoRemoverUmEventoQueNaoExiste(){
-        Long eventoId = 1L;
-        when(eventoRepository.existsById(ArgumentMatchers.eq(eventoId))).thenReturn(Boolean.FALSE);
-        ResponseEntity<Object> result = eventoService.delete(eventoId);
-        verify(eventoRepository, Mockito.never()).deleteById(ArgumentMatchers.any());
+    public void deveRetornarErroAoRemoverUmEventoQueNaoExiste() throws Exception {
+        when(eventoRepository.existsById(anyLong())).thenReturn(Boolean.FALSE);
+        ResponseEntity<Object> result = eventoService.delete(anyLong());
+        verify(eventoRepository, Mockito.never()).deleteById(anyLong());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 }

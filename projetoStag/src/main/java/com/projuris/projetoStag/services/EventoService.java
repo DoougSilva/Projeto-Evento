@@ -51,9 +51,9 @@ public class EventoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<EventoDTO> findAll(PageRequest pageRequest) {
+    public ResponseEntity<Object> findAll(PageRequest pageRequest) {
         Page<Evento> list = eventoRepository.findAll(pageRequest);
-        return list.map(EventoDTO::new);
+        return ResponseEntity.status(HttpStatus.OK).body(list.map(EventoDTO::new));
     }
 
     public ResponseEntity<Object> updateEvento(Long id, EventoDTO eventoDTO){
@@ -141,6 +141,13 @@ public class EventoService {
             return true;
         }
         if (eventoDTO.getDate().isEqual(eventoDTO.getDateFinal())){
+            return true;
+        }
+        if(eventoDTO.getDateFinal().getHour() - eventoDTO.getDate().getHour() >= 6)
+            return true;
+        if(eventoDTO.getDate().getMonth() != eventoDTO.getDateFinal().getMonth()
+                || eventoDTO.getDate().getYear() != eventoDTO.getDateFinal().getYear()
+                || eventoDTO.getDate().getDayOfMonth() != eventoDTO.getDateFinal().getDayOfMonth()){
             return true;
         }
         return false;

@@ -27,13 +27,12 @@ public class EventoResource {
     }
 
     @GetMapping
-    public ResponseEntity<Page<EventoDTO>> getAllEvento(
+    public ResponseEntity<Object> getAllEvento(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         PageRequest pageRequeste = PageRequest.of(page, size);
-        Page<EventoDTO> list = eventoService.findAll(pageRequeste);
-        return ResponseEntity.status(HttpStatus.OK).body(list);
+        return eventoService.findAll(pageRequeste);
     }
 
 
