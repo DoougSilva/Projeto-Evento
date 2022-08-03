@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = FixedClockConfig.class)
-@AutoConfigureMockMvc
 @Transactional
 public class EventoResourceIT {
 
