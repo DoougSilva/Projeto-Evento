@@ -13,15 +13,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = FixedClockConfig.class)
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class EventoResourceIT {
 
     @Autowired
@@ -50,7 +50,6 @@ public class EventoResourceIT {
 
     @BeforeEach
     public void setUp(){
-        MockitoAnnotations.openMocks(this);
         mockMvc =  MockMvcBuilders.standaloneSetup(new EventoResource(eventoService)).build();
 
         mapper = new ObjectMapper();
@@ -81,7 +80,6 @@ public class EventoResourceIT {
 
     @Test
     public void testInsert() throws Exception {
-        tearDown();
         mockMvc.perform(post("/evento")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsBytes(eventoDTO)))
@@ -91,7 +89,6 @@ public class EventoResourceIT {
 
     @Test
     public void testDelete() throws Exception{
-        tearDown();
         eventoRepository.save(this.evento);
         mockMvc.perform(delete("/evento/id/{id}", this.evento.getId())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
@@ -123,7 +120,6 @@ public class EventoResourceIT {
 
     @Test
     public void testFindAll() throws Exception{
-        tearDown();
         eventoRepository.save(this.evento);
         eventoRepository.save(this.evento);
         mockMvc.perform(get("/evento?size=1")
