@@ -1,6 +1,7 @@
 package com.projuris.projetoStag.resources;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
+import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.services.EventoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,8 +23,8 @@ public class EventoResource {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO){
-        return eventoService.saveEvento(eventoDTO);
+    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.saveEvento(eventoDTO));
     }
 
     @GetMapping
@@ -42,8 +43,8 @@ public class EventoResource {
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO){
-        return eventoService.updateEvento(id, eventoDTO);
+    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventoService.updateEvento(id, eventoDTO));
     }
 
     @DeleteMapping("/id/{id}")

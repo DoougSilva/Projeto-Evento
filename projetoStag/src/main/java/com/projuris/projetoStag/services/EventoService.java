@@ -2,8 +2,10 @@ package com.projuris.projetoStag.services;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.entities.Evento;
+import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.repositories.EventoRepository;
 import com.projuris.projetoStag.dtos.PayloadErrorDTO;
+import com.projuris.projetoStag.validation.EventoValidation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -15,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -33,21 +33,13 @@ public class EventoService {
     private final Clock clock;
 
 
-    public ResponseEntity<Object> saveEvento(EventoDTO eventoDTO) {
-        if (eventoDTO.getName().length() < 2){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PayloadErrorDTO("Name invalid."));
-        }
-        if(existsEvento(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PayloadErrorDTO("Chamber used in Data."));
-        }
-        if(checkDate(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new PayloadErrorDTO("Date invalid."));
-        }
+    public EventoDTO saveEvento(EventoDTO eventoDTO) throws ValidEventException {
+        EventoValidation.validaEvento(eventoDTO, this.eventoRepository, this.clock);
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
         eventoRepository.save(evento);
         Optional<Evento> rest = eventoRepository.findById(evento.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(toEventoDTO(rest.get()));
+        return toEventoDTO(rest.get());
     }
 
     @Transactional(readOnly = true)
@@ -56,27 +48,18 @@ public class EventoService {
         return ResponseEntity.status(HttpStatus.OK).body(list.map(EventoDTO::new));
     }
 
-    public ResponseEntity<Object> updateEvento(Long id, EventoDTO eventoDTO){
+    public EventoDTO updateEvento(Long id, EventoDTO eventoDTO) throws ValidEventException {
         Optional<Evento> eventoOptional = eventoRepository.findById(id);
-        if(eventoOptional.isEmpty()){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PayloadErrorDTO("Evento with id " + id + " does not exists."));
-        }
-        if (eventoDTO.getName().length() > 2){
-            eventoOptional.get().setName(eventoDTO.getName());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Name invalid."));
-        }
+//        if(eventoOptional.isEmpty()){
+//           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new PayloadErrorDTO("Evento with id " + id + " does not exists."));
+//        }
         eventoDTO.setId(id);
-        if(existsEvento(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Chamber used in Data."));
-        }
-        if(checkDate(eventoDTO)){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new PayloadErrorDTO("Date invalid."));
-        }
+        EventoValidation.validaEvento(eventoDTO, this.eventoRepository, this.clock);
+        eventoOptional.get().setName(eventoDTO.getName());
         eventoOptional.get().setDate(eventoDTO.getDate());
         eventoOptional.get().setDateFinal(eventoDTO.getDateFinal());
         eventoOptional.get().setChamber(eventoDTO.getChamber());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(toEventoDTO(eventoOptional.get()));
+        return toEventoDTO(eventoOptional.get());
     }
 
     @Transactional(readOnly = true)
@@ -94,63 +77,6 @@ public class EventoService {
         }
         eventoRepository.deleteById(id);
         return ResponseEntity.status(HttpStatus.OK).body(new PayloadErrorDTO("Evento deleted successfully."));
-    }
-
-    private boolean existsEvento(EventoDTO eventoDTO) {
-        List<Evento> list = eventoRepository.findAll();
-        for(Evento evento : list){
-            if(eventoDTO.getDate().isAfter(evento.getDate())
-                    && eventoDTO.getDate().isBefore(evento.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()
-                    && eventoDTO.getId() != evento.getId()){
-               return true;
-            }
-            if(eventoDTO.getDateFinal().isAfter(evento.getDate())
-                    && eventoDTO.getDateFinal().isBefore(evento.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()
-                    && eventoDTO.getId() != evento.getId()){
-                return true;
-            }
-            if(eventoDTO.getDate().isEqual(evento.getDate())
-                    && eventoDTO.getDateFinal().isEqual(evento.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()
-                    && eventoDTO.getId() != evento.getId()){
-                return true;
-            }
-            if(evento.getDate().isAfter(eventoDTO.getDate())
-                    && evento.getDate().isBefore(eventoDTO.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()
-                    && eventoDTO.getId() != evento.getId()){
-                return true;
-            }
-            if(evento.getDateFinal().isAfter(eventoDTO.getDate())
-                    && evento.getDateFinal().isBefore(eventoDTO.getDateFinal())
-                    && eventoDTO.getChamber() == evento.getChamber()
-                    && eventoDTO.getId() != evento.getId()){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkDate(EventoDTO eventoDTO){
-        if(eventoDTO.getDateFinal().isBefore(eventoDTO.getDate())){
-            return true;
-        }
-        if(eventoDTO.getDate().isBefore(LocalDateTime.now(clock))){
-            return true;
-        }
-        if (eventoDTO.getDate().isEqual(eventoDTO.getDateFinal())){
-            return true;
-        }
-        if(eventoDTO.getDateFinal().getHour() - eventoDTO.getDate().getHour() >= 6)
-            return true;
-        if(eventoDTO.getDate().getMonth() != eventoDTO.getDateFinal().getMonth()
-                || eventoDTO.getDate().getYear() != eventoDTO.getDateFinal().getYear()
-                || eventoDTO.getDate().getDayOfMonth() != eventoDTO.getDateFinal().getDayOfMonth()){
-            return true;
-        }
-        return false;
     }
 
     private EventoDTO toEventoDTO(Evento evento){

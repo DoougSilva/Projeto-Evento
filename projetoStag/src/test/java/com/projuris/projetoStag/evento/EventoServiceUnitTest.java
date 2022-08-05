@@ -1,8 +1,9 @@
-package com.projuris.projetoStag;
+package com.projuris.projetoStag.evento;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.entities.Chamber;
 import com.projuris.projetoStag.entities.Evento;
+import com.projuris.projetoStag.helper.EventoMockHelper;
 import com.projuris.projetoStag.repositories.EventoRepository;
 import com.projuris.projetoStag.services.EventoService;
 import org.junit.jupiter.api.Assertions;
@@ -67,15 +68,10 @@ public class EventoServiceUnitTest{
         eventoService = new EventoService(eventoRepository, modelMapper, clock);
         when(clock.getZone()).thenReturn(NOW.getZone());
         when(clock.instant()).thenReturn(NOW.toInstant());
-        eventoDTO = EventoDTO.builder()
-                .name("Test")
-                .chamber(Chamber.SALA_1)
-                .build();
-        evento = Evento.builder()
-                .id(1L)
-                .name("Test")
-                .chamber(Chamber.SALA_1)
-                .build();
+
+        this.eventoDTO = EventoMockHelper.createEventoDTO();
+        this.evento = EventoMockHelper.createEvento();
+
         list = Collections.singletonList(evento);
         eventoOptional = Optional.of(evento);
         when(eventoRepository.findAll()).thenReturn(list);

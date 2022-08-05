@@ -1,4 +1,4 @@
-package com.projuris.projetoStag;
+package com.projuris.projetoStag.ConfigTest;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 @TestConfiguration
+public
 class FixedClockConfig {
 
     @Primary

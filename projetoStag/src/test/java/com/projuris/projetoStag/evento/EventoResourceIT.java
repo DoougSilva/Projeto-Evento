@@ -1,20 +1,19 @@
-package com.projuris.projetoStag;
+package com.projuris.projetoStag.evento;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.projuris.projetoStag.ConfigTest.FixedClockConfig;
 import com.projuris.projetoStag.dtos.EventoDTO;
-import com.projuris.projetoStag.entities.Chamber;
 import com.projuris.projetoStag.entities.Evento;
+import com.projuris.projetoStag.helper.EventoMockHelper;
 import com.projuris.projetoStag.repositories.EventoRepository;
 import com.projuris.projetoStag.resources.EventoResource;
 import com.projuris.projetoStag.services.EventoService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -57,29 +55,15 @@ public class EventoResourceIT {
         JavaTimeModule module = new JavaTimeModule();
         mapper.registerModule(module);
 
-        this.evento = Evento.builder()
-                .name("Test")
-                .date(LocalDateTime.of(2022, 7, 29, 9, 00))
-                .dateFinal(LocalDateTime.of(2022, 7, 29, 10, 00))
-                .chamber(Chamber.SALA_1)
-                .build();
-
-        this.eventoDTO = EventoDTO.builder()
-                .name("Test")
-                .date(LocalDateTime.of(2022, 7, 29, 9, 00))
-                .dateFinal(LocalDateTime.of(2022, 7, 29, 10, 00))
-                .chamber(Chamber.SALA_1)
-                .build();
+        this.evento = EventoMockHelper.createEvento();
+        this.eventoDTO = EventoMockHelper.createEventoDTO();
 
     }
 
-    @AfterEach
-    public void tearDown(){
-        eventoRepository.deleteAll();
-    }
 
     @Test
     public void testInsert() throws Exception {
+        eventoRepository.deleteAll();
         mockMvc.perform(post("/evento")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsBytes(eventoDTO)))
