@@ -29,35 +29,35 @@ public class EventoValidation {
                     && eventoDTO.getDate().isBefore(evento.getDateFinal())
                     && eventoDTO.getChamber() == evento.getChamber()
                     && eventoDTO.getId() != evento.getId()) {
-                message = ("Chamber used in Data.");
+                message = ("Chamber used in Data!s");
                 return true;
             }
             if (eventoDTO.getDateFinal().isAfter(evento.getDate())
                     && eventoDTO.getDateFinal().isBefore(evento.getDateFinal())
                     && eventoDTO.getChamber() == evento.getChamber()
                     && eventoDTO.getId() != evento.getId()) {
-                message = ("Chamber used in Data.");
+                message = ("Chamber used in Data!");
                 return true;
             }
             if (eventoDTO.getDate().isEqual(evento.getDate())
                     && eventoDTO.getDateFinal().isEqual(evento.getDateFinal())
                     && eventoDTO.getChamber() == evento.getChamber()
                     && eventoDTO.getId() != evento.getId()) {
-                message = ("Chamber used in Data.");
+                message = ("Chamber used in Data!");
                 return true;
             }
             if (evento.getDate().isAfter(eventoDTO.getDate())
                     && evento.getDate().isBefore(eventoDTO.getDateFinal())
                     && eventoDTO.getChamber() == evento.getChamber()
                     && eventoDTO.getId() != evento.getId()) {
-                message = ("Chamber used in Data.");
+                message = ("Chamber used in Data!");
                 return true;
             }
             if (evento.getDateFinal().isAfter(eventoDTO.getDate())
                     && evento.getDateFinal().isBefore(eventoDTO.getDateFinal())
                     && eventoDTO.getChamber() == evento.getChamber()
                     && eventoDTO.getId() != evento.getId()) {
-                message = ("Chamber used in Data.");
+                message = ("Chamber used in Data!");
                 return true;
             }
         }
@@ -67,25 +67,25 @@ public class EventoValidation {
 
     public boolean checkDate(EventoDTO eventoDTO, Clock clock) {
         if (eventoDTO.getDateFinal().isBefore(eventoDTO.getDate())) {
-            message = ("Date invalid.");
+            message = ("Date invalid!");
             return true;
         }
         if (eventoDTO.getDate().isBefore(LocalDateTime.now(clock))) {
-            message = ("Date invalid.");
+            message = ("Date invalid!");
             return true;
         }
         if (eventoDTO.getDate().isEqual(eventoDTO.getDateFinal())) {
-            message = ("Date invalid.");
+            message = ("Date invalid!");
             return true;
         }
         if (eventoDTO.getDateFinal().getHour() - eventoDTO.getDate().getHour() >= 6) {
-            message = ("Date invalid.");
+            message = ("Exceeded timeout!");
             return true;
         }
             if (eventoDTO.getDate().getMonth() != eventoDTO.getDateFinal().getMonth()
                     || eventoDTO.getDate().getYear() != eventoDTO.getDateFinal().getYear()
                     || eventoDTO.getDate().getDayOfMonth() != eventoDTO.getDateFinal().getDayOfMonth()) {
-               message = ("Date invalid.");
+               message = ("Exceeded timeout!");
                 return true;
             }
             return false;
@@ -94,14 +94,14 @@ public class EventoValidation {
 
         public boolean validName (String name){
             if (name.length() <= 2) {
-                message = ("Name invalid.");
+                message = ("Name invalid!");
                 return true;
             }
             return false;
         }
 
         public Evento existsEvento(Long id, EventoRepository eventoRepository) throws ExistsEventoException {
-        Evento evento = eventoRepository.findById(id).orElseThrow(() -> new ExistsEventoException("Evento with id " + id + " does not exists."));
+        Evento evento = eventoRepository.findById(id).orElseThrow(() -> new ExistsEventoException("Evento with id " + id + " does not exists!"));
         return evento;
         }
     }

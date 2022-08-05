@@ -1,6 +1,7 @@
 package com.projuris.projetoStag.services;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
+import com.projuris.projetoStag.dtos.PayloadDTO;
 import com.projuris.projetoStag.entities.Evento;
 import com.projuris.projetoStag.exception.ExistsEventoException;
 import com.projuris.projetoStag.exception.ValidEventException;
@@ -63,10 +64,10 @@ public class EventoService {
         }
 
 
-    public String delete(Long id) throws ExistsEventoException {
+    public Object delete(Long id) throws ExistsEventoException {
         Evento evento = EventoValidation.existsEvento(id, this.eventoRepository);
-        eventoRepository.deleteById(id);
-        return "Evento deleted successfully.";
+        eventoRepository.delete(evento);
+        return new PayloadDTO("Evento deleted successfully!");
     }
 
     private EventoDTO toEventoDTO(Evento evento){
