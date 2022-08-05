@@ -2,6 +2,7 @@ package com.projuris.projetoStag.validation;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.entities.Evento;
+import com.projuris.projetoStag.exception.ExistsEventoException;
 import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.repositories.EventoRepository;
 import lombok.experimental.UtilityClass;
@@ -15,13 +16,13 @@ public class EventoValidation {
     private String message;
 
     public boolean validaEvento(EventoDTO eventoDTO , EventoRepository eventoRepository,Clock clock) throws ValidEventException {
-        if (existeEvento(eventoDTO, eventoRepository) || checkDate(eventoDTO, clock) || validName(eventoDTO.getName())) {
+        if (validDate(eventoDTO, eventoRepository) || checkDate(eventoDTO, clock) || validName(eventoDTO.getName())) {
             throw new ValidEventException(message);
         }
         return false;
     }
 
-    public boolean existeEvento(EventoDTO eventoDTO, EventoRepository eventoRepository) {
+    public boolean validDate(EventoDTO eventoDTO, EventoRepository eventoRepository) {
         List<Evento> list = eventoRepository.findAll();
         for (Evento evento : list) {
             if (eventoDTO.getDate().isAfter(evento.getDate())
@@ -99,5 +100,9 @@ public class EventoValidation {
             return false;
         }
 
+        public Evento existsEvento(Long id, EventoRepository eventoRepository) throws ExistsEventoException {
+        Evento evento = eventoRepository.findById(id).orElseThrow(() -> new ExistsEventoException("Evento with id " + id + " does not exists."));
+        return evento;
+        }
     }
 

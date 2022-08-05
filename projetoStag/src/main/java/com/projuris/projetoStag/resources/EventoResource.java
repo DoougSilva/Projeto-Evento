@@ -1,9 +1,9 @@
 package com.projuris.projetoStag.resources;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
+import com.projuris.projetoStag.exception.ExistsEventoException;
 import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.services.EventoService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,22 +33,22 @@ public class EventoResource {
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         PageRequest pageRequeste = PageRequest.of(page, size);
-        return eventoService.findAll(pageRequeste);
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findAll(pageRequeste));
     }
 
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id){
-            return eventoService.findByEventoId(id);
+    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {
+            return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoId(id));
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
+    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException, ExistsEventoException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventoService.updateEvento(id, eventoDTO));
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id){
-        return eventoService.delete(id);
+    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
     }
 }

@@ -50,7 +50,5 @@ public class Evento implements Serializable {
         this.dateFinal = byId.get().getDateFinal();
         this.chamber = byId.get().getChamber();
     }
-    public Evento(Long id){
-        this.id = id;
-    }
+
 }
