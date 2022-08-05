@@ -23,7 +23,7 @@ public class EventoResource {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
+    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException, ExistsEventoException {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.saveEvento(eventoDTO));
     }
 

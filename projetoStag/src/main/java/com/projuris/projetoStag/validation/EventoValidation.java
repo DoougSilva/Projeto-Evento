@@ -10,6 +10,8 @@ import lombok.experimental.UtilityClass;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 @UtilityClass
 public class EventoValidation {
 
@@ -19,7 +21,7 @@ public class EventoValidation {
         if (validDate(eventoDTO, eventoRepository) || checkDate(eventoDTO, clock) || validName(eventoDTO.getName())) {
             throw new ValidEventException(message);
         }
-        return false;
+        return true;
     }
 
     public boolean validDate(EventoDTO eventoDTO, EventoRepository eventoRepository) {
@@ -101,8 +103,11 @@ public class EventoValidation {
         }
 
         public Evento existsEvento(Long id, EventoRepository eventoRepository) throws ExistsEventoException {
-        Evento evento = eventoRepository.findById(id).orElseThrow(() -> new ExistsEventoException("Evento with id " + id + " does not exists!"));
-        return evento;
+        Optional<Evento> eventoOptional = eventoRepository.findById(id);
+        if(eventoOptional.isEmpty()){
+            throw new ExistsEventoException("Evento with id " + id + " does not exists!");
+        }
+        return eventoOptional.get();
         }
     }
 

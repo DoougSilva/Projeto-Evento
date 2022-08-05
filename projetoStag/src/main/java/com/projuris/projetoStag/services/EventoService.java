@@ -37,8 +37,7 @@ public class EventoService {
         var evento = new Evento();
         BeanUtils.copyProperties(eventoDTO, evento);
         eventoRepository.save(evento);
-        Optional<Evento> rest = eventoRepository.findById(evento.getId());
-        return toEventoDTO(rest.get());
+        return toEventoDTO(evento);
     }
 
     @Transactional(readOnly = true)
