@@ -74,7 +74,7 @@ public class EventoResourceIT {
     @Test
     public void testDelete() throws Exception{
         eventoRepository.save(this.evento);
-        mockMvc.perform(delete("/evento/id/{id}", this.evento.getId())
+        mockMvc.perform(delete("/evento/del-id/{id}", this.evento.getId())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(status().isOk());
         Assertions.assertEquals(0L, eventoRepository.findAll().size());
@@ -85,7 +85,7 @@ public class EventoResourceIT {
         Evento eventoOptional = eventoRepository.save(this.evento);
         EventoDTO eventoUpdate = new EventoDTO(eventoRepository.findById(eventoOptional.getId()));
         eventoUpdate.setName("TestDoTest");
-        mockMvc.perform(put("/evento/id/{id}", eventoUpdate.getId())
+        mockMvc.perform(put("/evento/put-id/{id}", eventoUpdate.getId())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsBytes(eventoUpdate)))
                         .andExpect(status().isAccepted());
@@ -96,7 +96,7 @@ public class EventoResourceIT {
     @Test
     public void testFindId() throws Exception{
         Evento eventoOptional = eventoRepository.save(this.evento);
-        mockMvc.perform(get("/evento/id/{id}", eventoOptional.getId())
+        mockMvc.perform(get("/evento/get-id/{id}", eventoOptional.getId())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));

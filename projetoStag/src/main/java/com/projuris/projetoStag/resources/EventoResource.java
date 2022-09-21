@@ -37,17 +37,17 @@ public class EventoResource {
     }
 
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/get-id/{id}")
     public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {
             return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoId(id));
     }
 
-    @PutMapping("/id/{id}")
+    @PutMapping("/put-id/{id}")
     public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException, ExistsEventoException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventoService.updateEvento(id, eventoDTO));
     }
 
-    @DeleteMapping("/id/{id}")
+    @DeleteMapping("/del-id/{id}")
     public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
     }
