@@ -7,7 +7,6 @@ import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.helper.EventoMockHelper;
 import com.projuris.projetoStag.repositories.EventoRepository;
 import com.projuris.projetoStag.services.EventoService;
-import com.projuris.projetoStag.validation.EventoValidation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class EventoServiceUnitTest{
+public class EventoServiceUnitTest {
 
     EventoService eventoService;
 
@@ -59,10 +59,12 @@ public class EventoServiceUnitTest{
 
     private Evento evento;
 
+    private List<Evento> list;
 
     Optional<Evento> eventoOptional;
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         eventoService = new EventoService(eventoRepository, modelMapper, clock);
         when(clock.getZone()).thenReturn(NOW.getZone());
@@ -71,6 +73,10 @@ public class EventoServiceUnitTest{
         this.eventoDTO = EventoMockHelper.createEventoDTO();
         this.evento = EventoMockHelper.createEvento();
 
+        list = Collections.singletonList(evento);
+        eventoOptional = Optional.of(evento);
+        when(eventoRepository.findAll()).thenReturn(list);
+        when(eventoRepository.save(ArgumentMatchers.any(Evento.class))).thenReturn(evento);
     }
 
     @Test
@@ -78,13 +84,14 @@ public class EventoServiceUnitTest{
         eventoService.saveEvento(eventoDTO);
         verify(eventoRepository, Mockito.times(1)).save(ArgumentMatchers.any(Evento.class));
     }
+
     @Test
-    public void deveAtualizarUmEvento() throws Exception{
+    public void deveAtualizarUmEvento() throws Exception {
         eventoDTO.setName("TesteDoTest");
-        eventoDTO.setDate(LocalDateTime.of(2022,7,28, 8, 30));
-        eventoDTO.setDateFinal(LocalDateTime.of(2022,7,28, 9, 00));
-        evento.setDate(LocalDateTime.of(2022,7,28, 8, 00));
-        evento.setDateFinal(LocalDateTime.of(2022,7,28, 10,00 ));
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 8, 30));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 10, 00));
         eventoOptional = Optional.of(evento);
         when(eventoRepository.findById(1L)).thenReturn(eventoOptional);
         eventoService.updateEvento(evento.getId(), eventoDTO);
@@ -95,13 +102,7 @@ public class EventoServiceUnitTest{
     }
 
     @Test
-    public void deveRetornarErroAoAtualizarUmEventoQueNaoExiste(){
-        Assertions.assertThrows(ExistsEventoException.class, () -> {
-            eventoService.updateEvento(evento.getId(), eventoDTO);
-        } );
-    }
-    @Test
-    public void deveRetornarUmaListaDeEventos() throws Exception {
+    public void deveRetornarUmaListaDeEventos() {
         PageRequest pageRequest = PageRequest.of(0, 10);
         List<Evento> list = Collections.singletonList(evento);
         Page<Evento> lista = new PageImpl<Evento>(list);
@@ -109,14 +110,6 @@ public class EventoServiceUnitTest{
         eventoService.findAll(pageRequest);
         verify(eventoRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(PageRequest.class));
     }
-
-   @Test
-    public void deveRetornarErroAoBuscarUmEventoQueNaoExiste()throws Exception {
-        Assertions.assertThrows(ExistsEventoException.class, () -> {
-            eventoService.findByEventoId(1L);
-        } );
-    }
-
 
     @Test
     public void deveRetornarUmEvento() throws Exception {
@@ -134,10 +127,147 @@ public class EventoServiceUnitTest{
         verify(eventoRepository, Mockito.times(1)).delete(evento);
     }
 
+    @Test // teste da validação existsEvento cenario 01
+    public void deveRetornarErroAoPersistitUmEventoComDataInicialEtiverDentroDeOutroEvento() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 8, 15));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 45));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 30));
+        List<Evento> list;
+        list = Collections.singletonList(evento);
+        when(eventoRepository.findAll()).thenReturn(list);
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação existsEvento cenario 02
+    public void deveRetornarErroAoPersistitUmEventoComDataFinalEtiverDentroDeOutroEvento() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 45));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 30));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 00));
+        List<Evento> list;
+        list = Collections.singletonList(evento);
+        when(eventoRepository.findAll()).thenReturn(list);
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação existsEvento cenario 03
+    public void deveRetornarErroAoPersistitUmEventoComDatasDeUmEventoExistente() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 45));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 45));
+        List<Evento> list;
+        list = Collections.singletonList(evento);
+        when(eventoRepository.findAll()).thenReturn(list);
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação existsEvento cenario 04
+    public void deveRetornarErroAoPersistitUmEventoComDatasEntreUmEventoExistente() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 8, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 8, 10));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 50));
+        List<Evento> list;
+        list = Collections.singletonList(evento);
+        when(eventoRepository.findAll()).thenReturn(list);
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação  existsEvento cenario 05
+    public void deveRetornarErroAoPersistitUmEventoComNomeInvalido() {
+        eventoDTO.setName("");
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 9, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 30));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 10, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 11, 00));
+        List<Evento> list;
+        list = Collections.singletonList(evento);
+        when(eventoRepository.findAll()).thenReturn(list);
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação checkDate cenario 01
+    public void deveRetornarErroAoPersistitUmEventoComDataFinalAnteriorDaDataInicial() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 9, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 8, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 9, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 10, 00));
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação checkDate cenario 02
+    public void deveRetornarErroAoPersistitUmEventoComDataInicialAnteriorDaDataAtual() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 7, 59));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 9, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 10, 00));
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação checkDate cenario 03
+    public void deveRetornarErroAoPersistitUmEventoComDataInicialIgualDataFinal() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 9, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 10, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 11, 00));
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação checkDate cenario 04
+    public void deveRetornarErroAoPersistitUmEventoComDataExedendoTempoLimite() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 12, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 18, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 10, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 11, 00));
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+    @Test // teste da validação checkDate cenario 05
+    public void deveRetornarErroAoPersistitUmEventoComDatasMuitoDistantes() {
+        eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 12, 00));
+        eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 29, 17, 00));
+        evento.setDate(LocalDateTime.of(2022, 7, 28, 10, 00));
+        evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 11, 00));
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
     @Test
-    public void deveRetornarErroAoRemoverUmEventoQueNaoExiste() throws Exception {
+    public void deveRetornarErroAoRemoverUmEventoQueNaoExiste() {
         Assertions.assertThrows(ExistsEventoException.class, () -> {
             eventoService.delete(evento.getId());
         });
     }
+
+    @Test
+    public void deveRetornarErroAoPersistirUmEventoComNomeInvalido() throws Exception {
+        eventoDTO.setName("te");
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.saveEvento(eventoDTO);
+        });
+    }
+
+
+
 }
