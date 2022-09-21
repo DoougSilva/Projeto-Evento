@@ -61,7 +61,7 @@ public class EventoServiceUnitTest {
 
     private List<Evento> list;
 
-    Optional<Evento> eventoOptional;
+    private Optional<Evento> eventoOptional;
 
     @BeforeEach
     void setUp() {
@@ -267,7 +267,4 @@ public class EventoServiceUnitTest {
             eventoService.saveEvento(eventoDTO);
         });
     }
-
-
-
 }
