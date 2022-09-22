@@ -22,7 +22,7 @@
             <column  name="date_final"  type="timestamp">
                 <constraints  nullable="false"/>
             </column>
-            <column  name="chamber"  type="varchar(6)">
+            <column  name="chamber"  type="int">
                 <constraints  nullable="false"/>
             </column>
         </createTable>

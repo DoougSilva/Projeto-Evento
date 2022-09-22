@@ -3,6 +3,7 @@ package com.projuris.projetoStag.services;
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.dtos.PayloadDTO;
 import com.projuris.projetoStag.entities.Evento;
+import com.projuris.projetoStag.enums.Chamber;
 import com.projuris.projetoStag.exception.ExistsEventoException;
 import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.repositories.EventoRepository;
@@ -48,6 +49,13 @@ public class EventoService {
         return list.map(EventoDTO::new);
     }
 
+    @Transactional(readOnly = true)
+    public Page<Object> findByChamber(Integer chamberCode, PageRequest pageRequest) throws ValidEventException {
+
+        Page<Evento> list = eventoRepository.findAllByChamber(chamberCode, pageRequest);
+        return list.map(EventoDTO::new);
+    }
+
     public EventoDTO updateEvento(Long id, EventoDTO eventoDTO) throws ExistsEventoException, ValidEventException {
         Evento evento = checkEvento(id);
         eventoDTO.setId(evento.getId());
@@ -83,7 +91,7 @@ public class EventoService {
         return true;
     }
 
-    private boolean existsEvento(EventoDTO eventoDTO) {
+    private boolean existsEvento(EventoDTO eventoDTO) throws ValidEventException {
         List<Evento> list = eventoRepository.findAll();
         for(Evento evento : list){
             if(eventoDTO.getDate().isAfter(evento.getDate())

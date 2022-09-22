@@ -1,6 +1,8 @@
 package com.projuris.projetoStag.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.projuris.projetoStag.enums.Chamber;
+import com.projuris.projetoStag.exception.ValidEventException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,15 +42,20 @@ public class Evento implements Serializable {
     private LocalDateTime dateFinal;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private Chamber chamber;
+    private Integer chamber;
 
-    public Evento(Optional<Evento> byId) {
-        this.id = byId.get().getId();
-        this.name = byId.get().getName();
-        this.date = byId.get().getDate();
-        this.dateFinal = byId.get().getDateFinal();
-        this.chamber = byId.get().getChamber();
+    public Evento(String name, LocalDateTime date, LocalDateTime dateFinal, Chamber chamber) {
+        this.name = name;
+        this.date = date;
+        this.dateFinal = dateFinal;
+        setChamber(chamber);
     }
 
+    public Chamber getChamber() {
+        return Chamber.valueOf(chamber);
+    }
+
+    public void setChamber(Chamber chamber) {
+        this.chamber = chamber.getCode();
+    }
 }

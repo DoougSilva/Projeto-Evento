@@ -1,7 +1,7 @@
 package com.projuris.projetoStag.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.projuris.projetoStag.entities.Chamber;
+import com.projuris.projetoStag.enums.Chamber;
 import com.projuris.projetoStag.entities.Evento;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

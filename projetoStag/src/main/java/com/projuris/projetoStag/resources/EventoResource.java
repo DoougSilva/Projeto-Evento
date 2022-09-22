@@ -36,6 +36,16 @@ public class EventoResource {
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.findAll(pageRequeste));
     }
 
+    @GetMapping("/chamber/{chamber}")
+    public ResponseEntity<Object> getByChamber(
+            @PathVariable(value = "chamber") Integer chamberCode,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) throws ValidEventException {
+        PageRequest pageRequeste = PageRequest.of(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByChamber(chamberCode ,pageRequeste));
+    }
+
 
     @GetMapping("/get-id/{id}")
     public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {

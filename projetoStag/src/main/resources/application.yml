@@ -7,6 +7,10 @@ spring:
   profiles:
     active: dev
   jpa:
+    show-sql: true
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      format_sql: true
     database: POSTGRESQL
     hibernate:
       ddl-auto: none
@@ -41,4 +45,7 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     properties:
-      hibernate.hbm2ddl.auto: create
+      hibernate:
+        hbm2ddl:
+          auto: create
+        dialect: org.hibernate.dialect.H2Dialect

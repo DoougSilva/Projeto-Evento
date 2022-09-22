@@ -1,7 +1,7 @@
 package com.projuris.projetoStag.helper;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
-import com.projuris.projetoStag.entities.Chamber;
+import com.projuris.projetoStag.enums.Chamber;
 import com.projuris.projetoStag.entities.Evento;
 import lombok.experimental.UtilityClass;
 
