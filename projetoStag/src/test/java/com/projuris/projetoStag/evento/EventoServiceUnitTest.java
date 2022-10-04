@@ -59,8 +59,6 @@ public class EventoServiceUnitTest {
 
     private Evento evento;
 
-    private List<Evento> list;
-
     private Optional<Evento> eventoOptional;
 
     @BeforeEach
@@ -72,11 +70,6 @@ public class EventoServiceUnitTest {
 
         this.eventoDTO = EventoMockHelper.createEventoDTO();
         this.evento = EventoMockHelper.createEvento();
-
-        list = Collections.singletonList(evento);
-        eventoOptional = Optional.of(evento);
-        when(eventoRepository.findAll()).thenReturn(list);
-        when(eventoRepository.save(ArgumentMatchers.any(Evento.class))).thenReturn(evento);
     }
 
     @Test
@@ -114,9 +107,8 @@ public class EventoServiceUnitTest {
     @Test
     public void deveRetornarUmEvento() throws Exception {
         eventoOptional = Optional.of(evento);
-        when(eventoRepository.findById(evento.getId())).thenReturn(eventoOptional);
-        eventoService.findByEventoId(evento.getId());
-        verify(eventoRepository, Mockito.times(1)).findById(ArgumentMatchers.any(Long.class));
+        when(eventoRepository.findByNameIgnoreCase(evento.getName())).thenReturn(eventoOptional);
+        eventoService.findByEventoName(evento.getName());verify(eventoRepository, Mockito.times(1)).findByNameIgnoreCase(ArgumentMatchers.any(String.class));
     }
 
     @Test
@@ -261,10 +253,21 @@ public class EventoServiceUnitTest {
     }
 
     @Test
-    public void deveRetornarErroAoPersistirUmEventoComNomeInvalido() throws Exception {
+    public void deveRetornarErroAoPersistirUmEventoComNomeInvalido() {
         eventoDTO.setName("te");
         assertThrows(ValidEventException.class, () -> {
             eventoService.saveEvento(eventoDTO);
         });
     }
+
+    @Test
+    public void deveRetornarErroAoBuscarUmEventoQueNaoExiste() {
+        eventoOptional = Optional.empty();
+        when(eventoRepository.findByNameIgnoreCase(evento.getName())).thenReturn(eventoOptional);
+        assertThrows(ExistsEventoException.class, () -> {
+            eventoService.findByEventoName(evento.getName());
+        });
+    }
+
+
 }

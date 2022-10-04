@@ -47,9 +47,9 @@ public class EventoResource {
     }
 
 
-    @GetMapping("/get-id/{id}")
-    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {
-            return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoId(id));
+    @GetMapping("/get-id/{name}")
+    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "name") String name) throws ExistsEventoException {
+            return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoName(name));
     }
 
     @PutMapping("/put-id/{id}")
