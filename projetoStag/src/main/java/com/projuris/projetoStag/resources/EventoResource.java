@@ -47,9 +47,14 @@ public class EventoResource {
     }
 
 
-    @GetMapping("/get-id/{name}")
-    public ResponseEntity<Object> getOneEvento(@PathVariable(value = "name") String name) throws ExistsEventoException {
-            return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoName(name));
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Object> getByName(
+            @PathVariable(value = "name") String name,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) throws ValidEventException {
+        PageRequest pageRequeste = PageRequest.of(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoName(name ,pageRequeste));
     }
 
     @PutMapping("/put-id/{id}")

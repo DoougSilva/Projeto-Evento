@@ -105,10 +105,23 @@ public class EventoServiceUnitTest {
     }
 
     @Test
-    public void deveRetornarUmEvento() throws Exception {
-        eventoOptional = Optional.of(evento);
-        when(eventoRepository.findByNameIgnoreCase(evento.getName())).thenReturn(eventoOptional);
-        eventoService.findByEventoName(evento.getName());verify(eventoRepository, Mockito.times(1)).findByNameIgnoreCase(ArgumentMatchers.any(String.class));
+    public void deveRetornarUmaListaDeEventosPorChamber() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<Evento> list = Collections.singletonList(evento);
+        Page<Evento> lista = new PageImpl<Evento>(list);
+        when(eventoRepository.findAllByChamber(anyInt() , any(PageRequest.class))).thenReturn(lista);
+        eventoService.findByChamber(evento.getChamber().getCode(),pageRequest);
+        verify(eventoRepository, Mockito.times(1)).findAllByChamber(anyInt() , any(PageRequest.class));
+    }
+
+    @Test
+    public void deveRetornarUmaListaDeEventosPorName() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<Evento> list = Collections.singletonList(evento);
+        Page<Evento> lista = new PageImpl<Evento>(list);
+        when(eventoRepository.findByNameIgnoreCase(anyString() , any(PageRequest.class))).thenReturn(lista);
+        eventoService.findByEventoName(evento.getName(),pageRequest);
+        verify(eventoRepository, Mockito.times(1)).findByNameIgnoreCase(anyString() , any(PageRequest.class));
     }
 
     @Test
@@ -259,15 +272,5 @@ public class EventoServiceUnitTest {
             eventoService.saveEvento(eventoDTO);
         });
     }
-
-    @Test
-    public void deveRetornarErroAoBuscarUmEventoQueNaoExiste() {
-        eventoOptional = Optional.empty();
-        when(eventoRepository.findByNameIgnoreCase(evento.getName())).thenReturn(eventoOptional);
-        assertThrows(ExistsEventoException.class, () -> {
-            eventoService.findByEventoName(evento.getName());
-        });
-    }
-
 
 }

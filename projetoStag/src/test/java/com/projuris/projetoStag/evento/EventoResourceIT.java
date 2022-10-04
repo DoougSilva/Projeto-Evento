@@ -94,12 +94,29 @@ public class EventoResourceIT {
     }
 
     @Test
-    public void testFindId() throws Exception{
+    public void testFindByName() throws Exception{
+        eventoRepository.save(this.evento);
+        eventoRepository.save(this.evento);
         Evento eventoOptional = eventoRepository.save(this.evento);
-        mockMvc.perform(get("/evento/get-id/{id}", eventoOptional.getId())
+        mockMvc.perform(get("/evento/name/{name}", eventoOptional.getName())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(jsonPath("$.totalElements", notNullValue()))
+                        .andExpect(jsonPath("$.totalPages", notNullValue()));
+    }
+
+    @Test
+    public void testFindByChamber() throws Exception{
+        eventoRepository.save(this.evento);
+        eventoRepository.save(this.evento);
+        Evento eventoOptional = eventoRepository.save(this.evento);
+        mockMvc.perform(get("/evento/chamber/{chamber}", eventoOptional.getChamber().getCode())
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(jsonPath("$.totalElements", notNullValue()))
+                        .andExpect(jsonPath("$.totalPages", notNullValue()));
     }
 
     @Test

@@ -66,13 +66,10 @@ public class EventoService {
     }
 
     @Transactional(readOnly = true)
-    public EventoDTO findByEventoName(String name) throws ExistsEventoException {
-        Optional<Evento> eventoOptional = eventoRepository.findByNameIgnoreCase(name);
-        if (eventoOptional.isEmpty()){
-            throw new ExistsEventoException("Evento with name " + name + " does not exists!");
-        }
-        return toEventoDTO(eventoOptional.get());
-        }
+    public Page<Object> findByEventoName(String name, PageRequest pageRequest) {
+        Page<Evento> list = eventoRepository.findByNameIgnoreCase(name, pageRequest);
+        return list.map(EventoDTO::new);
+    }
 
 
     public Object delete(Long id) throws ExistsEventoException {
