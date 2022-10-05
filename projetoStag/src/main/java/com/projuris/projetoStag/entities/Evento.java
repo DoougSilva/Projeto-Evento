@@ -2,7 +2,6 @@ package com.projuris.projetoStag.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.projuris.projetoStag.enums.Chamber;
-import com.projuris.projetoStag.exception.ValidEventException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Data
 @Builder

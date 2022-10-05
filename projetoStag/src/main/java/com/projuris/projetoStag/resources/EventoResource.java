@@ -1,7 +1,6 @@
 package com.projuris.projetoStag.resources;
 
 import com.projuris.projetoStag.dtos.EventoDTO;
-import com.projuris.projetoStag.exception.ExistsEventoException;
 import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.services.EventoService;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +22,7 @@ public class EventoResource {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException, ExistsEventoException {
+    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.saveEvento(eventoDTO));
     }
 
@@ -41,7 +40,7 @@ public class EventoResource {
             @PathVariable(value = "chamber") Integer chamberCode,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size
-    ) throws ValidEventException {
+    ) {
         PageRequest pageRequeste = PageRequest.of(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByChamber(chamberCode ,pageRequeste));
     }
@@ -52,18 +51,18 @@ public class EventoResource {
             @PathVariable(value = "name") String name,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size
-    ) throws ValidEventException {
+    ){
         PageRequest pageRequeste = PageRequest.of(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoName(name ,pageRequeste));
     }
 
     @PutMapping("/put-id/{id}")
-    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException, ExistsEventoException {
+    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException{
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventoService.updateEvento(id, eventoDTO));
     }
 
     @DeleteMapping("/del-id/{id}")
-    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id) throws ExistsEventoException {
+    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id) throws ValidEventException {
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
     }
 }

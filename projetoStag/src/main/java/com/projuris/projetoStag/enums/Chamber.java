@@ -1,6 +1,5 @@
 package com.projuris.projetoStag.enums;
 
-import com.projuris.projetoStag.exception.ValidEventException;
 import lombok.Getter;
 
 @Getter

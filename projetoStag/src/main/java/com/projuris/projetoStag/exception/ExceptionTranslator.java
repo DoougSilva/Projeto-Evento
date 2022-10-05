@@ -13,20 +13,10 @@ public class ExceptionTranslator {
     @ExceptionHandler({ValidEventException.class})
     public ResponseEntity<EventoProblem> validationexeption(ValidEventException exception, NativeWebRequest request){
         EventoProblem problem = EventoProblem.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.CONFLICT.value())
                 .message(exception.getMessage())
                 .title("ValidEventException")
                 .build();
-        return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({ExistsEventoException.class})
-    public ResponseEntity<EventoProblem> validationexeption(ExistsEventoException exception, NativeWebRequest request){
-        EventoProblem problem = EventoProblem.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .message(exception.getMessage())
-                .title("ExistsEventoException")
-                .build();
-        return new ResponseEntity<>(problem, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(problem, HttpStatus.CONFLICT);
     }
 }
