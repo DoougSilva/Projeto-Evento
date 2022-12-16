@@ -31,12 +31,10 @@ public class Evento implements Serializable {
 
     @NotNull
     @Column
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime date;
 
     @NotNull
     @Column
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime dateFinal;
 
     @NotNull

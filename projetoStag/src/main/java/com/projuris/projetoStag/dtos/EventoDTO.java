@@ -26,11 +26,9 @@ public class EventoDTO {
     private String name;
 
     @NotNull
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime date;
 
     @NotNull
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime dateFinal;
 
     @NotNull
