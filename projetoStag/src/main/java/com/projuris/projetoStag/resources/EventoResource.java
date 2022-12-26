@@ -3,9 +3,9 @@ package com.projuris.projetoStag.resources;
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.exception.ValidEventException;
 import com.projuris.projetoStag.services.EventoService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,47 +22,59 @@ public class EventoResource {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.saveEvento(eventoDTO));
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventoDTO saveEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
+        return eventoService.saveEvento(eventoDTO);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllEvento(
+    @ResponseStatus(HttpStatus.OK)
+    public Page<Object> getAllEvento(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         PageRequest pageRequeste = PageRequest.of(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findAll(pageRequeste));
+        return eventoService.findAll(pageRequeste);
     }
 
     @GetMapping("/chamber/{chamber}")
-    public ResponseEntity<Object> getByChamber(
+    @ResponseStatus(HttpStatus.OK)
+    public Page<Object> getByChamber(
             @PathVariable(value = "chamber") Integer chamberCode,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
         PageRequest pageRequeste = PageRequest.of(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByChamber(chamberCode ,pageRequeste));
+        return eventoService.findByChamber(chamberCode ,pageRequeste);
     }
 
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<Object> getByName(
+    @ResponseStatus(HttpStatus.OK)
+    public Page<Object> getByName(
             @PathVariable(value = "name") String name,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         PageRequest pageRequeste = PageRequest.of(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findByEventoName(name ,pageRequeste));
+        return eventoService.findByEventoName(name ,pageRequeste);
     }
 
-    @PutMapping("/put-id/{id}")
-    public ResponseEntity<Object> updateEvento(@PathVariable(value = "id") Long id, @RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException{
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventoService.updateEvento(id, eventoDTO));
+    @GetMapping("/id/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EventoDTO findById(@PathVariable(value = "id") Long id) throws ValidEventException {
+        return eventoService.findById(id);
+    }
+
+    @PutMapping("/put")
+    @ResponseStatus(HttpStatus.OK)
+    public EventoDTO updateEvento(@RequestBody @Valid EventoDTO eventoDTO) throws ValidEventException {
+        return eventoService.updateEvento(eventoDTO);
     }
 
     @DeleteMapping("/del-id/{id}")
-    public ResponseEntity<Object> deleteEvento(@PathVariable(value = "id") Long id) throws ValidEventException {
-        return ResponseEntity.status(HttpStatus.OK).body(eventoService.delete(id));
+    @ResponseStatus(HttpStatus.OK)
+    public Object deleteEvento(@PathVariable(value = "id") Long id) throws ValidEventException {
+        return eventoService.delete(id);
     }
 }

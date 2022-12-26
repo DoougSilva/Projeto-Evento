@@ -85,10 +85,10 @@ public class EventoResourceIT {
         Evento eventoOptional = eventoRepository.save(this.evento);
         EventoDTO eventoUpdate = new EventoDTO(eventoRepository.findById(eventoOptional.getId()));
         eventoUpdate.setName("TestDoTest");
-        mockMvc.perform(put("/evento/put-id/{id}", eventoUpdate.getId())
+        mockMvc.perform(put("/evento/put/", eventoUpdate.getId())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsBytes(eventoUpdate)))
-                        .andExpect(status().isAccepted());
+                        .andExpect(status().isOk());
         Evento updateOptional = eventoRepository.findById(eventoUpdate.getId()).get();
         assertThat(updateOptional.getName()).isEqualTo("TestDoTest");
     }
@@ -117,6 +117,16 @@ public class EventoResourceIT {
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(jsonPath("$.totalElements", notNullValue()))
                         .andExpect(jsonPath("$.totalPages", notNullValue()));
+    }
+
+    @Test
+    public void testFindById() throws Exception{
+        eventoRepository.save(this.evento);
+        Evento eventoOptional = eventoRepository.save(this.evento);
+        mockMvc.perform(get("/evento/id/{id}", eventoOptional.getId())
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test

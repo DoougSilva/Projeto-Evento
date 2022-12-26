@@ -1,5 +1,8 @@
 package com.projuris.projetoStag.evento;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.projuris.projetoStag.dtos.EventoDTO;
 import com.projuris.projetoStag.entities.Evento;
 import com.projuris.projetoStag.exception.ValidEventException;
@@ -26,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -79,6 +83,7 @@ public class EventoServiceUnitTest {
 
     @Test
     public void deveAtualizarUmEvento() throws Exception {
+        eventoDTO.setId(1L);
         eventoDTO.setName("TesteDoTest");
         eventoDTO.setDate(LocalDateTime.of(2022, 7, 28, 8, 30));
         eventoDTO.setDateFinal(LocalDateTime.of(2022, 7, 28, 9, 00));
@@ -86,11 +91,11 @@ public class EventoServiceUnitTest {
         evento.setDateFinal(LocalDateTime.of(2022, 7, 28, 10, 00));
         eventoOptional = Optional.of(evento);
         when(eventoRepository.findById(1L)).thenReturn(eventoOptional);
-        eventoService.updateEvento(evento.getId(), eventoDTO);
-        Assertions.assertEquals(eventoOptional.get().getName(), eventoDTO.getName());
-        Assertions.assertEquals(eventoOptional.get().getDate(), eventoDTO.getDate());
-        Assertions.assertEquals(eventoOptional.get().getDateFinal(), eventoDTO.getDateFinal());
-        Assertions.assertEquals(eventoOptional.get().getChamber(), eventoDTO.getChamber());
+        eventoService.updateEvento(eventoDTO);
+        assertEquals(eventoOptional.get().getName(), eventoDTO.getName());
+        assertEquals(eventoOptional.get().getDate(), eventoDTO.getDate());
+        assertEquals(eventoOptional.get().getDateFinal(), eventoDTO.getDateFinal());
+        assertEquals(eventoOptional.get().getChamber(), eventoDTO.getChamber());
     }
 
     @Test
@@ -124,11 +129,31 @@ public class EventoServiceUnitTest {
     }
 
     @Test
-    public void deveRemoverUmEvento() throws Exception {
+    public void deveRemoverUmEvento() {
         eventoOptional = Optional.of(evento);
         when(eventoRepository.findById(evento.getId())).thenReturn(eventoOptional);
         eventoService.delete(evento.getId());
         verify(eventoRepository, Mockito.times(1)).delete(evento);
+    }
+
+    @Test
+    public void deveRetornarUmEvento() {
+        eventoOptional = Optional.of(evento);
+        when(eventoRepository.findById(evento.getId())).thenReturn(eventoOptional);
+        EventoDTO result = eventoService.findById(evento.getId());
+        assertEquals(result.getName(), evento.getName());
+        assertEquals(result.getDate(), evento.getDate());
+        assertEquals(result.getDateFinal(), evento.getDateFinal());
+        assertEquals(result.getChamber(), evento.getChamber());
+    }
+
+    @Test
+    public void deveRetornarErroQuandoNaoEncontrarUmEvento() {
+        eventoOptional = Optional.empty();
+        when(eventoRepository.findById(evento.getId())).thenReturn(eventoOptional);
+        assertThrows(ValidEventException.class, () -> {
+            eventoService.findById(evento.getId());
+        });
     }
 
     @Test // teste da validação existsEvento cenario 01

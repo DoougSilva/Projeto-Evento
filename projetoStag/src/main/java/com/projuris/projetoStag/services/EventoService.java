@@ -51,8 +51,7 @@ public class EventoService {
         return list.map(EventoDTO::new);
     }
 
-    public EventoDTO updateEvento(Long id, EventoDTO eventoDTO) throws ValidEventException {
-        eventoDTO.setId(id);
+    public EventoDTO updateEvento(EventoDTO eventoDTO) throws ValidEventException {
         Evento evento = validateUpdate(eventoDTO);
         evento.setName(eventoDTO.getName());
         evento.setDate(eventoDTO.getDate());
@@ -67,15 +66,20 @@ public class EventoService {
         return list.map(EventoDTO::new);
     }
 
+    @Transactional(readOnly = true)
+    public EventoDTO findById(Long id) {
+        Optional<Evento> evento = eventoRepository.findById(id);
+        if (evento.isEmpty()){
+            throw new ValidEventException("Evento não existe");
+        }
+        return new EventoDTO(evento);
+    }
 
+    @Transactional
     public Object delete(Long id) throws ValidEventException {
         Evento evento = validateDelete(id);
         eventoRepository.delete(evento);
         return new PayloadDTO("Evento deleted successfully!");
-    }
-
-    private EventoDTO toEventoDTO(Evento evento){
-        return modelMapper.map(evento, EventoDTO.class);
     }
 
     private void validateInsert(EventoDTO eventoDTO) throws ValidEventException {
@@ -104,5 +108,9 @@ public class EventoService {
                 .validateWithException(aux);
         Optional<Evento> evento = eventoRepository.findById(aux.getId());
         return evento.get();
+    }
+
+    private EventoDTO toEventoDTO(Evento evento){
+        return modelMapper.map(evento, EventoDTO.class);
     }
 }
